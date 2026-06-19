@@ -22,6 +22,7 @@ set -e
 REGION="europe-west1"
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
 VOS_BUCKET="${PROJECT_ID}-orion-vos"
+RUNTIME_SA_NAME="orion-runner"
 
 if [ -z "$PROJECT_ID" ]; then
   echo "No Google Cloud project is selected."
@@ -56,11 +57,34 @@ fi
 gcloud config set project "$PROJECT_ID"
 
 PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
-RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+RUNTIME_SA="${RUNTIME_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+CLOUDBUILD_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
 
 echo ""
 echo "=== Preparing deployer-owned VOSviewer map storage: gs://${VOS_BUCKET} ==="
-gcloud services enable storage.googleapis.com --project="$PROJECT_ID" --quiet
+gcloud services enable \
+  iam.googleapis.com \
+  bigquery.googleapis.com \
+  storage.googleapis.com \
+  --project="$PROJECT_ID" \
+  --quiet
+
+if ! gcloud iam service-accounts describe "$RUNTIME_SA" --project="$PROJECT_ID" >/dev/null 2>&1; then
+  gcloud iam service-accounts create "$RUNTIME_SA_NAME" \
+    --project="$PROJECT_ID" \
+    --display-name="ORION Cloud Run runtime service account"
+fi
+
+gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SA" \
+  --member="serviceAccount:${CLOUDBUILD_SA}" \
+  --role="roles/iam.serviceAccountUser" \
+  --project="$PROJECT_ID" \
+  --quiet
+
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${RUNTIME_SA}" \
+  --role="roles/bigquery.jobUser" \
+  --quiet
 
 if ! gcloud storage buckets describe "gs://${VOS_BUCKET}" --project="$PROJECT_ID" >/dev/null 2>&1; then
   gcloud storage buckets create "gs://${VOS_BUCKET}" \

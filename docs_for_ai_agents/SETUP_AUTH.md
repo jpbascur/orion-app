@@ -25,31 +25,31 @@ bq add-iam-policy-binding \
 
 ---
 
-## Step 2 — Grant your Cloud Run service account bigquery.jobUser on itself
+## Step 2 - Grant BigQuery Job User On Billing Projects
 
-The service account needs permission to create jobs in the user's project.
-Wait — it can't. The user's project grants this automatically to any
-authenticated Google identity running jobs there. Since the service account
-is a valid Google identity, it can submit jobs to any project where it has
-`bigquery.jobUser`. The user needs to grant this once:
+The Cloud Run service account needs permission to create BigQuery jobs in the
+project that the user enters on the login page.
+
+For the deployer's own project, `DEPLOY.sh` grants this automatically to:
+
+```text
+orion-runner@YOUR_PROJECT_ID.iam.gserviceaccount.com
+```
+
+For any other billing project, the owner of that project needs to grant this
+once:
 
 ```bash
 # User runs this in their own Cloud Shell, replacing values:
 gcloud projects add-iam-policy-binding MY-PROJECT-ID \
-  --member=serviceAccount:YOUR_CLOUD_RUN_SERVICE_ACCOUNT \
+  --member=serviceAccount:orion-runner@YOUR_DEPLOYMENT_PROJECT_ID.iam.gserviceaccount.com \
   --role=roles/bigquery.jobUser
 ```
 
-Show this command to users on a "setup" page after they log in.
-Find your Cloud Run service account with:
-```bash
-gcloud run services describe orion-app \
-  --region europe-west1 \
-  --format='value(spec.template.spec.serviceAccountName)'
-```
+Show this command to users on a setup page after they log in. The app exposes
+the service account through `/api/config` so the frontend can display it.
 
 ---
-
 ## Step 3 — Create OAuth credentials
 
 1. Go to https://console.cloud.google.com/apis/credentials
