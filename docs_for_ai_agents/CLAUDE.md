@@ -25,14 +25,14 @@ The correct zip command is:
 cd /home/claude && zip -r /mnt/user-data/outputs/app.zip app \
   --exclude "app/.cache/*" \
   --exclude "app/.git/*" \
-  --exclude "app/client/node_modules/*"
+  --exclude "app/frontend/node_modules/*"
 ```
 
 ### 2. Never suggest workflow changes mid-task
 Don't suggest committing files manually, uploading via Cloud Shell, or any other approach that deviates from the zip-in / zip-out workflow. If there's a problem with a file (e.g. missing `package-lock.json`), fix it within the zip — don't ask the user to do extra steps.
 
-### 3. `package-lock.json` does not currently exist in this repo
-To add it: run `npm install` locally in `client/`, then commit `package-lock.json` to the repo. Only after it is committed should the Dockerfile be updated to copy it and use `npm ci`. Do not ask the user to generate it in Cloud Shell or any remote environment.
+### 3. Keep frontend dependency installs reproducible
+`frontend/package-lock.json` is committed. Use `npm ci` for clean installs and Docker builds. If dependencies change, update `frontend/package.json` and regenerate `frontend/package-lock.json` together.
 
 ---
 
@@ -40,14 +40,13 @@ To add it: run `npm install` locally in `client/`, then commit `package-lock.jso
 
 ```
 app/
-├── main.py                  # FastAPI backend
+├── main.py                  # FastAPI app entrypoint
+├── backend/                 # FastAPI backend modules
 ├── requirements.txt
 ├── Dockerfile
-├── cloudbuild.yaml          # Production Cloud Build config
-├── cloudbuild.dev.yaml      # Dev Cloud Build config
+├── deployment/              # Cloud Build configs
 ├── DEPLOY.sh                # Deploy script (bash DEPLOY.sh --dev)
-├── GENERATE_LOCKFILE.sh
-└── client/                  # React frontend
+└── frontend/                # React frontend
     ├── package.json
     ├── public/
     └── src/
@@ -78,4 +77,5 @@ The user deploys from Google Cloud Shell:
 git checkout dev && git pull && bash DEPLOY.sh --dev
 ```
 
-Cloud Build uses Kaniko for layer caching. The `cloudbuild.yaml` uses a pinned Kaniko version and explicit `--cache-repo` for reliable caching between builds.
+Cloud Build uses Kaniko for layer caching. The production `deployment/cloudbuild.yaml` uses a pinned Kaniko version and explicit `--cache-repo` for reliable caching between builds.
+

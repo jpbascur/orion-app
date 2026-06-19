@@ -1,7 +1,12 @@
 node_modules/
-client/node_modules/
+frontend/node_modules/
 .env
 __pycache__/
 *.pyc
+.uv-cache/
+.uv-python/
+.npm-cache/
+.claude/
 .DS_Store
 build/
+frontend/build/

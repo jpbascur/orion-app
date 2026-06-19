@@ -42,43 +42,27 @@ BigQuery query costs are billed to the **user's own GCP project**, not the host.
 
 - A [Google Cloud project](https://console.cloud.google.com/projectcreate) with billing enabled
 - The BigQuery API enabled on that project
-- A Google OAuth 2.0 client ID configured for your domain (see [SETUP_AUTH.md](SETUP_AUTH.md))
-- Docker (for local development) or access to Google Cloud Shell (for deployment)
+- A Google OAuth 2.0 client ID configured for your domain (see [docs_for_ai_agents/SETUP_AUTH.md](docs_for_ai_agents/SETUP_AUTH.md))
+- Access to Google Cloud Shell for deployment
 
-### Running locally
+### Deploying from Cloud Shell
 
 ```bash
 # 1. Clone the repo
 git clone https://github.com/jpbascur/orion-app.git
 cd orion-app
 
-# 2. Set up environment variables
-cp .env.example .env
-# Edit .env and fill in your OAuth credentials and a SESSION_SECRET
+# 2. Make sure Cloud Shell is using your deployment project
+gcloud config set project YOUR_PROJECT_ID
 
-# 3. Build the React frontend
-cd client && npm install && npm run build && cd ..
-
-# 4. Run the backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-Then open [http://localhost:8000](http://localhost:8000).
-
-For a full local development guide, see [DEV_SETUP.md](DEV_SETUP.md).
-
-### Deploying to Google Cloud Run
-
-```bash
-# Production
+# 3. Deploy to Google Cloud Run
 bash DEPLOY.sh
 
-# Dev/staging environment
+# Or deploy the dev/staging service
 bash DEPLOY.sh --dev
 ```
 
-See [SETUP.md](SETUP.md) for first-time deployment instructions.
+See [docs_for_ai_agents/SETUP.md](docs_for_ai_agents/SETUP.md) for first-time deployment instructions.
 
 ---
 
@@ -86,13 +70,13 @@ See [SETUP.md](SETUP.md) for first-time deployment instructions.
 
 ```
 orion-app/
-├── main.py                  # FastAPI backend — all API endpoints
+├── main.py                  # FastAPI app entrypoint
+├── backend/                 # FastAPI backend modules
 ├── requirements.txt
 ├── Dockerfile
 ├── DEPLOY.sh                # Cloud Run deployment script
-├── cloudbuild.yaml          # Cloud Build config (production)
-├── cloudbuild.dev.yaml      # Cloud Build config (dev)
-├── client/
+├── deployment/              # Cloud Build configs
+├── frontend/
 │   ├── public/
 │   └── src/
 │       ├── App.js           # Root component, routing, shared state
@@ -110,10 +94,7 @@ orion-app/
 │           ├── Guide.js
 │           ├── LoginGate.js
 │           └── ErrorPage.js
-├── SETUP.md
-├── SETUP_AUTH.md
-├── DEV_SETUP.md
-├── CHANGELOG.md
+├── docs_for_ai_agents/      # AI-agent notes and detailed setup docs
 └── LICENSE
 ```
 

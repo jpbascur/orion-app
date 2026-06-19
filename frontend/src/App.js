@@ -47,14 +47,14 @@ export default function App() {
   }, []);
 
   const navTab = (key, label, count) => (
-    <a
+    <button
       key={key}
-      href="#"
+      type="button"
       className={'nav-tab' + (page === key ? ' active' : '')}
-      onClick={e => { e.preventDefault(); setPage(key); }}
+      onClick={() => setPage(key)}
     >
       {label}{count > 0 && <span className="badge">{count}</span>}
-    </a>
+    </button>
   );
 
   const searchActive = page === 'institutions' || page === 'funders';
@@ -77,7 +77,7 @@ export default function App() {
     <>
       <nav>
         <span className="logo">⭐ ORION</span>
-        <span style={{ fontSize: '.65rem', color: '#2d3148', marginLeft: '-.75rem', marginTop: '.1rem', alignSelf: 'flex-end', paddingBottom: '12px' }}>v0.1.0</span>
+        <span style={{ fontSize: '.65rem', color: '#2d3148', marginLeft: '-.75rem', marginTop: '.1rem', alignSelf: 'flex-end', paddingBottom: '12px' }}>v0.2.0</span>
 
         {navTab('overview', 'Overview', 0)}
 

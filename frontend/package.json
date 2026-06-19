@@ -1,5 +1,5 @@
 {
-  "name": "orion-client",
+  "name": "orion-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -24,7 +24,6 @@
       "react-hooks/exhaustive-deps": "warn"
     }
   },
-  "proxy": "http://localhost:8080",
   "browserslist": {
     "production": [
       ">0.2%",

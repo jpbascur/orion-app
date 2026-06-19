@@ -1,8 +1,8 @@
 steps:
   # Build and push using kaniko — caches layers to GCS between builds.
-  # This means npm install and pip install are skipped when unchanged,
+  # This means npm ci and pip install are skipped when unchanged,
   # even on fresh Cloud Build VMs.
-  - name: 'gcr.io/kaniko-project/executor:latest'
+  - name: 'gcr.io/kaniko-project/executor:v1.23.0'
     args:
       - '--destination=gcr.io/$PROJECT_ID/orion-app-dev:latest'
       - '--cache=true'
@@ -22,5 +22,8 @@ steps:
       - 'managed'
       - '--region'
       - 'europe-west1'
+      - '--service-account'
+      - '$PROJECT_NUMBER-compute@developer.gserviceaccount.com'
+      - '--update-env-vars'
+      - 'ORION_SERVICE_ACCOUNT=$PROJECT_NUMBER-compute@developer.gserviceaccount.com,ORION_VOS_BUCKET=$PROJECT_ID-orion-vos'
       - '--allow-unauthenticated'
-

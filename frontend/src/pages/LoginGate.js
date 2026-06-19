@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-
-const SERVICE_ACCOUNT = '112226578999-compute@developer.gserviceaccount.com';
+import { useServiceAccount } from '../config';
 
 const S = {
   page:       { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1117', padding: '1.5rem' },
@@ -27,6 +26,7 @@ export default function LoginGate() {
   const [error, setError]         = useState('');
   const [copied, setCopied]       = useState(false);
   const [copiedRole, setCopiedRole] = useState(false);
+  const serviceAccount = useServiceAccount();
 
   const bqApiUrl = `https://console.cloud.google.com/flows/enableapi?apiid=bigquery.googleapis.com`;
   const iamUrl = projectId.trim()
@@ -36,7 +36,7 @@ export default function LoginGate() {
   const handleLogin = () => {
     const pid = projectId.trim();
     if (!pid) { setError('Please enter your Google Cloud project ID.'); return; }
-    if (!/^[a-z][a-z0-9\-]{4,28}[a-z0-9]$/.test(pid)) {
+    if (!/^[a-z][a-z0-9-]{4,28}[a-z0-9]$/.test(pid)) {
       setError("That doesn't look right — 6–30 lowercase letters, digits, or hyphens, starting with a letter.");
       return;
     }
@@ -44,7 +44,7 @@ export default function LoginGate() {
   };
 
   const copyServiceAccount = () => {
-    navigator.clipboard.writeText(SERVICE_ACCOUNT).catch(() => {});
+    navigator.clipboard.writeText(serviceAccount).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -111,7 +111,7 @@ export default function LoginGate() {
               <div style={S.codeBox}>
                 <span style={S.codeLabel}>New principals</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.75rem' }}>
-                  <code style={{ fontSize: '.77rem', color: '#a78bfa', flex: 1, wordBreak: 'break-all' }}>{SERVICE_ACCOUNT}</code>
+                  <code style={{ fontSize: '.77rem', color: '#a78bfa', flex: 1, wordBreak: 'break-all' }}>{serviceAccount}</code>
                   <button
                     onClick={copyServiceAccount}
                     style={{ flexShrink: 0, background: '#2d3148', border: '1px solid #3d4568', borderRadius: '5px', color: copied ? '#4ade80' : '#94a3b8', fontSize: '.72rem', padding: '.25rem .55rem', cursor: 'pointer' }}

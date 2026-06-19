@@ -8,7 +8,7 @@ const FIELDS = [
   { value: 'description', label: 'Description' },
 ];
 
-export default function Funders({ funderData, setFunderData, basket, addToBasket, addManyToBasket }) {
+export default function Funders({ funderData, setFunderData, basket, addToBasket, addManyToBasket, projectId }) {
   return (
     <EntityList
       entityData={funderData}
@@ -22,6 +22,7 @@ export default function Funders({ funderData, setFunderData, basket, addToBasket
       fields={FIELDS}
       title="Funders"
       csvName="funders.csv"
+      projectId={projectId}
       queryBuilder={(yf, yt, q, field) => buildFunderSearchQuery(q, field, yf, yt)}
       renderHeaders={SortTh => <>
         <SortTh k="name">Funder</SortTh>

@@ -4,18 +4,21 @@
 
 # Local dev artifacts
 node_modules
-client/node_modules
-client/build
+frontend/node_modules
+frontend/build
 __pycache__
 *.pyc
 *.pyo
+.claude
+.npm-cache
+.uv-cache
+.uv-python
 .env
 .env.*
 !.env.example
 
 # Docs / tooling not needed at runtime
 *.md
-DEV_SETUP.md
-SETUP.md
+docs_for_ai_agents/
+deployment/
 DEPLOY.sh
-cloudbuild*.yaml

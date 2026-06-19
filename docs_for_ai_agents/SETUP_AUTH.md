@@ -17,7 +17,7 @@ Run once in Cloud Shell:
 bq add-iam-policy-binding \
   --member=allUsers \
   --role=roles/bigquery.dataViewer \
-  dashboard-488117:orion_cache
+  YOUR_PROJECT_ID:orion_cache
 
 # If you control cwts-leiden, do the same there.
 # If not, ask the dataset owner to make it public.
@@ -36,7 +36,7 @@ is a valid Google identity, it can submit jobs to any project where it has
 ```bash
 # User runs this in their own Cloud Shell, replacing values:
 gcloud projects add-iam-policy-binding MY-PROJECT-ID \
-  --member=serviceAccount:YOUR-CLOUD-RUN-SA@dashboard-488117.iam.gserviceaccount.com \
+  --member=serviceAccount:YOUR_CLOUD_RUN_SERVICE_ACCOUNT \
   --role=roles/bigquery.jobUser
 ```
 
@@ -67,7 +67,7 @@ Configure consent screen at /apis/credentials/consent:
 ```bash
 gcloud run services update orion-app \
   --region europe-west1 \
-  --set-env-vars \
+  --update-env-vars \
     OAUTH_CLIENT_ID="your-client-id.apps.googleusercontent.com",\
     OAUTH_CLIENT_SECRET="your-client-secret",\
     OAUTH_REDIRECT_URI="https://YOUR-APP.run.app/auth/callback",\

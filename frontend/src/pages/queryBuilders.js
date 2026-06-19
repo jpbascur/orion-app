@@ -133,7 +133,7 @@ SELECT
     i.institution          AS name,
     i.country_iso_alpha2_code AS country,
     it.institution_type    AS type,
-    COUNT(DISTINCT wai.work_id) AS works_count
+    COUNT(DISTINCT w.work_id) AS works_count
 FROM \`${ORION_SOURCE}.institution\` i
 LEFT JOIN \`${ORION_SOURCE}.institution_type\` it
     ON i.institution_type_id = it.institution_type_id
@@ -163,7 +163,7 @@ SELECT
     f.funder                  AS name,
     f.country_iso_alpha2_code AS country,
     f.description,
-    COUNT(DISTINCT wg.work_id) AS works_count
+    COUNT(DISTINCT w.work_id) AS works_count
 FROM \`${ORION_SOURCE}.funder\` f
 LEFT JOIN \`${ORION_SOURCE}.work_grant\` wg
     ON f.funder_id = wg.funder_id

@@ -1,31 +1,34 @@
 #!/bin/bash
 set -e
 
-# ── ORION Dashboard — Deploy ──────────────────────────────────────────────────
-# Usage (from Cloud Shell):
+# ORION Dashboard deploy script.
+# Usage from Cloud Shell:
 #
 #   First time:
 #     git clone https://github.com/jpbascur/orion-app.git && cd orion-app
 #
-#   Every deploy after that — just pull and run, no rm needed:
+#   Every deploy after that, just pull and run:
 #     git pull && bash DEPLOY.sh [--dev]
 #
 #   Or to switch branches:
 #     git fetch && git checkout dev && bash DEPLOY.sh --dev
 #
-#   bash DEPLOY.sh        → deploy to PRODUCTION (orion-app)
-#   bash DEPLOY.sh --dev  → deploy to DEV (orion-app-dev)
+#   bash DEPLOY.sh        -> deploy to PRODUCTION (orion-app)
+#   bash DEPLOY.sh --dev  -> deploy to DEV (orion-app-dev)
 #
-# Why not rm -rf + git clone each time?
-#   It doesn't help — Docker layer caching happens on Cloud Build's remote VMs,
-#   not your local Cloud Shell. Re-cloning just wastes 30–60 seconds uploading
-#   a fresh build context instead of letting gcloud diff it.
-# ──────────────────────────────────────────────────────────────────────────────
+# Docker layer caching happens on Cloud Build's remote VMs, not in Cloud Shell.
+# Re-cloning the repo only wastes time uploading a fresh build context.
 
-PROJECT_ID="dashboard-488117"
 REGION="europe-west1"
+PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
+VOS_BUCKET="${PROJECT_ID}-orion-vos"
 
-# ── Parse flags ───────────────────────────────────────────────────────────────
+if [ -z "$PROJECT_ID" ]; then
+  echo "No Google Cloud project is selected."
+  echo "Run: gcloud config set project YOUR_PROJECT_ID"
+  exit 1
+fi
+
 ENV="prod"
 for arg in "$@"; do
   case $arg in
@@ -34,15 +37,14 @@ for arg in "$@"; do
   esac
 done
 
-# ── Resolve service name and build config per environment ─────────────────────
 if [ "$ENV" = "dev" ]; then
   SERVICE_NAME="orion-app-dev"
-  BUILD_CONFIG="cloudbuild.dev.yaml"
-  echo "🔧 Deploying to DEV environment ($SERVICE_NAME)"
+  BUILD_CONFIG="deployment/cloudbuild.dev.yaml"
+  echo "Deploying to DEV environment ($SERVICE_NAME)"
 else
   SERVICE_NAME="orion-app"
-  BUILD_CONFIG="cloudbuild.yaml"
-  echo "🚀 Deploying to PRODUCTION environment ($SERVICE_NAME)"
+  BUILD_CONFIG="deployment/cloudbuild.yaml"
+  echo "Deploying to PRODUCTION environment ($SERVICE_NAME)"
   echo ""
   read -p "Are you sure you want to deploy to production? [y/N] " confirm
   if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
@@ -51,15 +53,47 @@ else
   fi
 fi
 
-# ── Deploy ────────────────────────────────────────────────────────────────────
-gcloud config set project $PROJECT_ID
+gcloud config set project "$PROJECT_ID"
+
+PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
+RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+echo ""
+echo "=== Preparing deployer-owned VOSviewer map storage: gs://${VOS_BUCKET} ==="
+gcloud services enable storage.googleapis.com --project="$PROJECT_ID" --quiet
+
+if ! gcloud storage buckets describe "gs://${VOS_BUCKET}" --project="$PROJECT_ID" >/dev/null 2>&1; then
+  gcloud storage buckets create "gs://${VOS_BUCKET}" \
+    --project="$PROJECT_ID" \
+    --location="$REGION" \
+    --uniform-bucket-level-access
+fi
+
+LIFECYCLE_FILE="$(mktemp)"
+cat > "$LIFECYCLE_FILE" <<'JSON'
+{
+  "rule": [
+    {
+      "action": { "type": "Delete" },
+      "condition": { "age": 1, "matchesPrefix": ["vos/"] }
+    }
+  ]
+}
+JSON
+gcloud storage buckets update "gs://${VOS_BUCKET}" --lifecycle-file="$LIFECYCLE_FILE"
+rm -f "$LIFECYCLE_FILE"
+
+gcloud storage buckets add-iam-policy-binding "gs://${VOS_BUCKET}" \
+  --member="serviceAccount:${RUNTIME_SA}" \
+  --role="roles/storage.objectAdmin" \
+  --quiet
 
 echo ""
 echo "=== Building and deploying from current branch: $(git branch --show-current) ==="
 gcloud builds submit . \
-  --config=$BUILD_CONFIG \
-  --project=$PROJECT_ID
+  --config="$BUILD_CONFIG" \
+  --project="$PROJECT_ID"
 
 echo ""
-echo "✅ Done! Deployed URL:"
-gcloud run services describe $SERVICE_NAME --region $REGION --format 'value(status.url)'
+echo "Done! Deployed URL:"
+gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format 'value(status.url)'

@@ -6,9 +6,9 @@ input[type=number]{-moz-appearance:textfield}
 nav{background:#1a1d27;border-bottom:1px solid #2d3148;padding:0 2rem;display:flex;align-items:center;gap:1.5rem;height:56px}
 nav .logo{font-size:1.2rem;font-weight:700;color:#7c8cff;letter-spacing:.1em;margin-right:auto}
 /* flat top-level tabs (Overview, Guide) */
-a.nav-tab{color:#94a3b8;text-decoration:none;font-size:.9rem;padding:.4rem .8rem;border-radius:6px;transition:all .2s;position:relative;white-space:nowrap}
-a.nav-tab:hover,a.nav-tab.active{color:#e2e8f0;background:#2d3148}
-a.nav-tab .badge{position:absolute;top:-4px;right:-4px;background:#7c8cff;color:#fff;border-radius:10px;font-size:.65rem;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
+.nav-tab{color:#94a3b8;text-decoration:none;font-size:.9rem;padding:.4rem .8rem;border-radius:6px;transition:all .2s;position:relative;white-space:nowrap;background:none;border:0;font:inherit;cursor:pointer}
+.nav-tab:hover,.nav-tab.active{color:#e2e8f0;background:#2d3148}
+.nav-tab .badge{position:absolute;top:-4px;right:-4px;background:#7c8cff;color:#fff;border-radius:10px;font-size:.65rem;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
 /* grouped nav blocks */
 .nav-group{display:flex;flex-direction:column;align-items:center;height:56px;justify-content:center;gap:2px;padding:0 .25rem;border-radius:8px;transition:background .2s}
 .nav-group-active{background:#1e2233}
@@ -16,9 +16,9 @@ a.nav-tab .badge{position:absolute;top:-4px;right:-4px;background:#7c8cff;color:
 .nav-group-active .nav-group-label{color:#7c8cff}
 .nav-group-tabs{display:flex;align-items:center;gap:.25rem}
 /* sub-tabs inside a group */
-.nav-group a.nav-tab{font-size:.8rem;padding:.2rem .6rem;border-radius:5px;color:#64748b}
-.nav-group a.nav-tab:hover{color:#cbd5e1;background:#2d3148}
-.nav-group a.nav-tab.active{color:#e2e8f0;background:#2d3148}
+.nav-group .nav-tab{font-size:.8rem;padding:.2rem .6rem;border-radius:5px;color:#64748b}
+.nav-group .nav-tab:hover{color:#cbd5e1;background:#2d3148}
+.nav-group .nav-tab.active{color:#e2e8f0;background:#2d3148}
 .page{padding:2rem;max-width:1600px;margin:0 auto}
 h1{font-size:1.6rem;font-weight:700;color:#e2e8f0;margin-bottom:1.5rem}
 .controls{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-bottom:1.5rem;background:#1a1d27;border:1px solid #2d3148;border-radius:10px;padding:1rem 1.25rem}

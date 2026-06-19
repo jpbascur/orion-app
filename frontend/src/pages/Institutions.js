@@ -8,7 +8,7 @@ const FIELDS = [
   { value: 'type',    label: 'Type' },
 ];
 
-export default function Institutions({ instData, setInstData, basket, addToBasket, addManyToBasket }) {
+export default function Institutions({ instData, setInstData, basket, addToBasket, addManyToBasket, projectId }) {
   return (
     <EntityList
       entityData={instData}
@@ -22,6 +22,7 @@ export default function Institutions({ instData, setInstData, basket, addToBaske
       fields={FIELDS}
       title="Institutions"
       csvName="institutions.csv"
+      projectId={projectId}
       queryBuilder={(yf, yt, q, field) => buildInstSearchQuery(q, field, yf, yt)}
       renderHeaders={SortTh => <>
         <SortTh k="name">Institution</SortTh>

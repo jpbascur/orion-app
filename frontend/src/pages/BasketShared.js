@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react';
 import useTable from './useTable';
+import { useServiceAccount } from '../config';
 
 // Re-export query builders so existing imports don't break.
 export {
@@ -272,13 +273,12 @@ export function TopicsTable({ rows, loading, unclassified = 0 }) {
   );
 }
 
-const SA = '112226578999-compute@developer.gserviceaccount.com';
-
 /**
  * Shown when a query returns a 403 — guides the user through fixing their
  * IAM / BigQuery API setup without leaving the page.
  */
 export function PermissionError({ projectId }) {
+  const serviceAccount = useServiceAccount();
   const iamUrl = projectId
     ? `https://console.cloud.google.com/iam-admin/iam?project=${projectId}`
     : 'https://console.cloud.google.com/iam-admin/iam';
@@ -321,7 +321,7 @@ export function PermissionError({ projectId }) {
           </p>
           <div style={{ background: '#0f0505', borderRadius: '6px', padding: '.6rem .85rem', marginBottom: '.3rem' }}>
             <div style={{ fontSize: '.72rem', color: '#7f1d1d', marginBottom: '.2rem' }}>New principal:</div>
-            <code style={{ color: '#f9a8d4', fontSize: '.77rem', userSelect: 'all', wordBreak: 'break-all' }}>{SA}</code>
+            <code style={{ color: '#f9a8d4', fontSize: '.77rem', userSelect: 'all', wordBreak: 'break-all' }}>{serviceAccount}</code>
           </div>
           <div style={{ background: '#0f0505', borderRadius: '6px', padding: '.6rem .85rem' }}>
             <div style={{ fontSize: '.72rem', color: '#7f1d1d', marginBottom: '.2rem' }}>Role:</div>

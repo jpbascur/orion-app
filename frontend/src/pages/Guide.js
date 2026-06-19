@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useServiceAccount } from '../config';
 
 function Section({ title, children }) {
   const [open, setOpen] = useState(false);
@@ -94,6 +95,8 @@ JOIN \`cwts-leiden.openalex_2025aug.work\` w
 ORDER BY w.pub_year DESC`;
 
 export default function Guide() {
+  const serviceAccount = useServiceAccount();
+
   return (
     <div className="page" style={{ maxWidth: '860px' }}>
       <h1>Guide</h1>
@@ -126,7 +129,7 @@ export default function Guide() {
               <div style={{ marginBottom: '.4rem' }}>
                 <span style={{ fontSize: '.75rem', color: '#475569' }}>New principal:</span>
                 <br />
-                <code style={{ color: '#a78bfa', fontSize: '.8rem', userSelect: 'all' }}>112226578999-compute@developer.gserviceaccount.com</code>
+                <code style={{ color: '#a78bfa', fontSize: '.8rem', userSelect: 'all' }}>{serviceAccount}</code>
               </div>
               <div>
                 <span style={{ fontSize: '.75rem', color: '#475569' }}>Role:</span>

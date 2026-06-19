@@ -39,10 +39,10 @@ The dev service will have a different URL, so Google's OAuth client needs
 to allow it.
 
 1. Go to [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
-2. Open the OAuth 2.0 client: `112226578999-l7ho0ljveatvuff4jev25ecck51hhh1m`
+2. Open your OAuth 2.0 client
 3. Under **Authorized redirect URIs**, add:
    ```
-   https://orion-app-dev-kp52msbgxa-ew.a.run.app/auth/callback
+   https://YOUR_DEV_SERVICE_URL/auth/callback
    ```
    > **Note:** You won't know the exact dev URL until after the first
    > deploy in step 3. Do the first deploy, grab the URL from the output,
@@ -66,12 +66,12 @@ The dev service needs the same 4 env vars as production, but with the
 correct redirect URI for the dev URL:
 
 ```bash
-DEV_URL="https://orion-app-dev-kp52msbgxa-ew.a.run.app"  # replace with actual URL
+DEV_URL="https://YOUR_DEV_SERVICE_URL"
 
 gcloud run services update orion-app-dev \
   --region europe-west1 \
-  --set-env-vars \
-    OAUTH_CLIENT_ID="112226578999-l7ho0ljveatvuff4jev25ecck51hhh1m.apps.googleusercontent.com",\
+  --update-env-vars \
+    OAUTH_CLIENT_ID="your-client-id.apps.googleusercontent.com",\
     OAUTH_CLIENT_SECRET="<same as prod>",\
     OAUTH_REDIRECT_URI="${DEV_URL}/auth/callback",\
     SESSION_SECRET="<a different secret from prod>"
